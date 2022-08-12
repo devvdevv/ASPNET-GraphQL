@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace LearnEFCore.Domain.GraphQL.GraphQLSchema
+namespace WebApplication.Domain.GraphQL.GraphQLSchema
 {
     public class AppSchema : Schema
     {

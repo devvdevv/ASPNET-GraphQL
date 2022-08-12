@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Linq.Expressions;
-using WebApplication.Domain.Repositories;
+using WebApplication.Domain.Abstract;
+using WebApplication.Domain.Models;
 
 namespace WebApplication.Data.Repositories
 {
@@ -10,13 +11,13 @@ namespace WebApplication.Data.Repositories
     /// https://www.c-sharpcorner.com/article/generic-repository-pattern-in-asp-net-core/
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class Repository<TEntity> : IRepository<TEntity>, IQueryable<TEntity>, IEnumerable<TEntity>, IEnumerable, IQueryable
-        where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity>
+        where TEntity : Entity
     {
-        private readonly LearnEFCoreContext _context;
+        private readonly WebApplicationDbContext _context;
         private readonly DbSet<TEntity> dbSet;
 
-        public Repository(LearnEFCoreContext context)
+        public Repository(WebApplicationDbContext context)
         {
             _context = context;
             dbSet = context.Set<TEntity>();

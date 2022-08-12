@@ -1,13 +1,13 @@
 ﻿using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
-using LearnEFCore.Domain.GraphQL.GraphQLSchema;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Data;
 using WebApplication.Data.Repositories;
-using WebApplication.Domain.Repositories;
+using WebApplication.Domain.Abstract;
+using WebApplication.Domain.GraphQL.GraphQLSchema;
 
-namespace Client.Api
+namespace WebApplication.Api
 {
     public class Startup
     {
@@ -21,8 +21,8 @@ namespace Client.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDbContext<LearnEFCoreContext>(opt =>
-                opt.UseSqlServer("Data Source= (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiAppData"));
+            services.AddDbContext<WebApplicationDbContext>(opt =>
+                opt.UseSqlServer("Data Source= (localdb)\\MSSQLLocalDB; Initial Catalog=WebApplicationData"));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<AppSchema>();
             services.AddGraphQL()
@@ -36,7 +36,7 @@ namespace Client.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LearnEFCoreContext dbContext)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebApplicationDbContext dbContext)
         {
             if (env.IsDevelopment())
             {

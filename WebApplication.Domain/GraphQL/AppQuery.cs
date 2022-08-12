@@ -1,24 +1,25 @@
 ﻿using GraphQL.Types;
-using LearnEFCore.Domain.GraphQL.GraphQLTypes;
-using WebApplication.Domain.Repositories;
+using WebApplication.Domain.Abstract;
+using WebApplication.Domain.GraphQL.GraphQLTypes;
+using WebApplication.Domain.Models;
 
-namespace LearnEFCore.Domain.GraphQL
+namespace WebApplication.Domain.GraphQL
 {
     public class AppQuery : ObjectGraphType
     {
-        private readonly IRepository<Samurai> samuraiRepo;
+        private readonly IRepository<Person> _people;
 
-        public AppQuery(IRepository<Samurai> samuraiRepo)
+        public AppQuery(IRepository<Person> people)
         {
-            this.samuraiRepo = samuraiRepo;
-            GetSamurais();
+            _people = people;
+            GetPeople();
         }
 
-        public void GetSamurais()
+        public void GetPeople()
         {
-            Field<ListGraphType<SamuraiType>>(
-                "samurais",
-                resolve: context => samuraiRepo.ToList()
+            Field<ListGraphType<PersonType>>(
+                "people",
+                resolve: context => _people.ToList()
             );
         }
     }

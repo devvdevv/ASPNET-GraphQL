@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 
-namespace Client.Api
+namespace WebApplication.Api
 {
     public class Program
     {
