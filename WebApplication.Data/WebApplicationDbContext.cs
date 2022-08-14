@@ -7,10 +7,10 @@ namespace WebApplication.Data
     public class WebApplicationDbContext : DbContext
     {
         // TODO: fixed issue cannot run migration with this constructor
-        public WebApplicationDbContext(DbContextOptions<WebApplicationDbContext> options)
-            : base(options)
-        {
-        }
+        //public WebApplicationDbContext(DbContextOptions<WebApplicationDbContext> options)
+        //    : base(options)
+        //{
+        //}
 
         public DbSet<Person> Person { get; set; }
 
@@ -33,7 +33,7 @@ namespace WebApplication.Data
         {
             modelBuilder.Entity<Person>()
                 .HasMany(x => x.Cars)
-                .WithOne()
+                .WithOne(x => x.Owner)
                 .HasForeignKey("OwnById")
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -43,6 +43,12 @@ namespace WebApplication.Data
                     li.ToTable(nameof(Licence)).HasKey("Id");
                     li.Property<long>("Id");
                 });
+
+            modelBuilder.Entity<Car>()
+                .Property(x => x.Name);
+
+            modelBuilder.Entity<Car>()
+                .Property(x => x.Brand);
         }
 
         public void Seed()
