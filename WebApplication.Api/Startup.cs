@@ -21,8 +21,9 @@ namespace WebApplication.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDbContext<WebApplicationDbContext>(opt =>
-                opt.UseSqlServer("Data Source= (localdb)\\MSSQLLocalDB; Initial Catalog=WebApplicationData"));
+            services.AddDbContext<WebApplicationDbContext>();
+            //(opt => opt.UseSqlServer("Data Source= (localdb)\\MSSQLLocalDB; Initial Catalog=WebApplicationData"));
+
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<AppSchema>();
             services.AddGraphQL()
