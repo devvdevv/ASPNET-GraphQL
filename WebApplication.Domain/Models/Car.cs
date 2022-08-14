@@ -2,11 +2,11 @@
 {
     public class Car : Entity
     {
-        public Car(string name, string vin, Guid versionGuid, string brand, Person owner)
+        public Car(string name, string vin, string brand, Person owner)
         {
             Name = name;
             Vin = vin;
-            VersionGuid = versionGuid;
+            VersionGuid = Guid.NewGuid();
             Brand = brand.ToUpper();
             Owner = owner;
         }

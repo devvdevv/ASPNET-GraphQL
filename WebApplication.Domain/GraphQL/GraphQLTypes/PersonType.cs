@@ -1,4 +1,5 @@
 ﻿using GraphQL.Types;
+using Microsoft.EntityFrameworkCore;
 using WebApplication.Domain.Abstract;
 using WebApplication.Domain.Models;
 
@@ -7,6 +8,7 @@ namespace WebApplication.Domain.GraphQL.GraphQLTypes
     public sealed class PersonType : ObjectGraphType<Person>
     {
         public PersonType(
+            IRepository<Person> personRepo,
             IRepository<Car> carRepo,
             IRepository<Licence> licenceRepo)
         {
@@ -23,8 +25,11 @@ namespace WebApplication.Domain.GraphQL.GraphQLTypes
             Field<ListGraphType<LicenceType>>(
                 "licences",
                 resolve:
-                context => licenceRepo
-                    .Where(x => x.Owner.Id == context.Source.Id)
+                context => personRepo
+                    .Include(x => x.Licences)
+                    .Where(x => x.Id == context.Source.Id)
+                    .Select(x => x.Licences)
+                    .AsNoTracking()
                     .ToList());
         }
     }

@@ -6,11 +6,13 @@ namespace WebApplication.Data
 {
     public class WebApplicationDbContext : DbContext
     {
+        private readonly string _seedPath = $@"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Seed")}";
+
         // TODO: fixed issue cannot run migration with this constructor
-        //public WebApplicationDbContext(DbContextOptions<WebApplicationDbContext> options)
-        //    : base(options)
-        //{
-        //}
+        public WebApplicationDbContext(DbContextOptions<WebApplicationDbContext> options)
+            : base(options)
+        {
+        }
 
         public DbSet<Person> Person { get; set; }
 
@@ -53,18 +55,38 @@ namespace WebApplication.Data
 
         public void Seed()
         {
-            if (Person.Any())
-                return;
+            var random = new Random();
 
-            var people = GetPersonSeedData();
-            Person.AddRange(people);
+            if (!Person.Any())
+            {
+                var people = GetPersonSeedData();
+                Person.AddRange(people);
+            }
+
+            if (!Car.Any())
+            {
+                var cars = GetCarSeedData();
+                var people = Person.ToList();
+
+                foreach (var person in people)
+                {
+                    if (!cars.Any())
+                        break;
+
+                    var numberOfCarsCanOwn = random.Next(0, 4);
+                    var carSize = cars.Count();
+                    var carsCanOwn = cars.Take(carSize > numberOfCarsCanOwn ? numberOfCarsCanOwn : carSize);
+                    cars = cars.Where(x => !carsCanOwn.Contains(x));
+                    person.Cars.AddRange(carsCanOwn);
+                }
+            }
+
             base.SaveChanges();
         }
 
         public IEnumerable<Person> GetPersonSeedData()
         {
-            var basePath = $@"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Seed")}";
-            var seedPath = $@"{basePath}/Person.csv";
+            var seedPath = $@"{_seedPath}/Person.csv";
 
             var data = new List<Person>();
             using var reader = new StreamReader(seedPath);
@@ -76,6 +98,28 @@ namespace WebApplication.Data
 
                 var values = line.Split(',');
                 data.Add(new Person(values[0], values[1]));
+            }
+
+            return data;
+        }
+
+        public IEnumerable<Car> GetCarSeedData()
+        {
+            var seedPath = $@"{_seedPath}/Car.csv";
+
+            var data = new List<Car>();
+            using var reader = new StreamReader(seedPath);
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (line is null)
+                    break;
+
+                var values = line.Split(',');
+                var name = values[0];
+                var brand = values[1];
+                var vin = values[2];
+                data.Add(new Car(name, vin, brand, null));
             }
 
             return data;
