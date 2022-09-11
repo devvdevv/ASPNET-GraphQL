@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebApplication.Domain.Models;
 
@@ -22,7 +23,7 @@ namespace WebApplication.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source= (localdb)\\MSSQLLocalDB; Initial Catalog=WebApplicationData")
+            optionsBuilder.UseNpgsql("Host=localhost;Database=dotNetGraphQL;Username=postgres;Password=changeme")
                 .LogTo(Console.WriteLine,
                     new[] { DbLoggerCategory.Database.Command.Name },   
                     LogLevel.Information)
@@ -55,30 +56,44 @@ namespace WebApplication.Data
 
         public void Seed()
         {
-            var random = new Random();
+            SeedPeople();
+            SeedCars();
+        }
 
-            if (!Person.Any())
+        private void SeedPeople()
+        {
+            if (Person.Any())
             {
-                var people = GetPersonSeedData();
-                Person.AddRange(people);
+                return;
             }
 
-            if (!Car.Any())
+            var people = GetPersonSeedData();
+            Person.AddRange(people);
+            base.SaveChanges();
+        }
+
+        private void SeedCars()
+        {
+            var random = new Random();
+
+            if (Car.Any())
             {
-                var cars = GetCarSeedData();
-                var people = Person.ToList();
+                return;
+            }
 
-                foreach (var person in people)
-                {
-                    if (!cars.Any())
-                        break;
+            var cars = GetCarSeedData();
+            var people = Person.ToList();
 
-                    var numberOfCarsCanOwn = random.Next(0, 4);
-                    var carSize = cars.Count();
-                    var carsCanOwn = cars.Take(carSize > numberOfCarsCanOwn ? numberOfCarsCanOwn : carSize);
-                    cars = cars.Where(x => !carsCanOwn.Contains(x));
-                    person.Cars.AddRange(carsCanOwn);
-                }
+            foreach (var person in people)
+            {
+                if (!cars.Any())
+                    break;
+
+                var numberOfCarsCanOwn = random.Next(0, 4);
+                var carSize = cars.Count();
+                var carsCanOwn = cars.Take(carSize > numberOfCarsCanOwn ? numberOfCarsCanOwn : carSize);
+                cars = cars.Where(x => !carsCanOwn.Contains(x));
+                person.Cars.AddRange(carsCanOwn);
             }
 
             base.SaveChanges();
